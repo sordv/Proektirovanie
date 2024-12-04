@@ -8,6 +8,7 @@ namespace WindowsFormsApp1
         public bool IsHighlyQualified { get; set; }
         public bool IsRelocationParticipant { get; set; }
         public bool NeedsPatent { get; private set; }
+        public bool CanGetPatent { get; private set; }
         public List<string> Steps { get; private set; }
 
         public Roadmap()
@@ -20,25 +21,46 @@ namespace WindowsFormsApp1
             var exemptCountries = new List<string>
             {
                 "Азербайджан",
-                "Таджикистан",
-                "Узбекистан",
+                "Кыргызстан",
                 "Молдова",
-                "Украина"
+                "Таджикистан",
+                "Украина",
+                "Другая страна"
             };
 
-            // Проверяем необходимость патента
-            if (exemptCountries.Contains(Country) && (IsHighlyQualified || IsRelocationParticipant))
+            // Проверяем возможность получения патента
+            if (exemptCountries.Contains(Country) && Country == "Другая страна")
             {
-                NeedsPatent = false;
+                CanGetPatent = false;
             }
+
             else
             {
-                NeedsPatent = true;
+                CanGetPatent = true;
+
+                // Проверяем необходимость получения патента
+                if (IsHighlyQualified || IsRelocationParticipant)
+                {
+                    NeedsPatent = false;
+                }
+
+                else
+                {
+                    NeedsPatent = true;
+                }
+
             }
+
         }
 
         public void GenerateSteps()
         {
+            if (!CanGetPatent)
+            {
+                Steps.Add("Граждане вашей страны не могут получить патент.");
+                return;
+            }
+
             if (!NeedsPatent)
             {
                 Steps.Add("Патент получать не нужно, так как выполняются условия освобождения.");
